@@ -1,0 +1,46 @@
+Desenvolvedor:
+	João Vitor P. Moraes - jvlppm
+
+Descrição:
+	Em uma solução com vários Plugins, o acesso aos mesmos deve ser facilitado, mas de uma forma controlada e organizada.
+
+Funcionamento geral:
+	Um Plugin pode carregar outros Plugins sem a necessidade de um PluginManager, tornando estes novos plugins carregados disponíveis para aplicação.
+	Desta forma a aplicação pode carregar 3 Plugins, por exemplo, onde um deles irá carregar mais 2 Plugins auxiliares. Gerando assim uma Árvore de Ativaçao dos Plugins.
+	(Basicamente) Todo Plugin tem acesso direto a outros Plugins de seu "Ramo".
+
+-------------------------
+
+Todos os métodos disponíveis ao PluginManager também estão disponíveis a qualquer Plugin, de forma direta (estão implementados na base Plugin).
+
+Exemplo:
+	Suponha que a aplicação carregue 3 Plugins, um para Interface Gráfica, outro para Log e outro para leitura de dados de um servidor.
+	O Plugin para Interface Gráfica carregou mais 2 Plugins auxiliares, um para definir a Cor atual da aplicação e outro para carregar notícias / mensagens (exemplo RSS).
+	O Plugin de Log carregou um Plugin para acesso ao banco de dados.
+
+	Main
+	{
+		PLog
+		{
+			PBD
+		},
+		PServer,
+		PGui
+		{
+			CalculaCor,
+			MostraNoticias
+		}
+	}
+
+	Com a chamada do método PluginManager.GetPlugin<PLog>() a partir da aplicação principal, será retornado o objeto já instanciado do gerenciador de Logs.
+	Caso o Plugin de acesso ao Servidor faça a chamada GetPlugin<PLog>(), o mesmo objeto gerenciador de Logs será retornado.
+
+	Um plugin qualquer pode acessar os outros Plugins de mesmo nível e também os plugins disponíveis ao seu Pai.
+	Assim, o Plugin CalculaCor pode Gravar mensagens no Log e ter acesso a configurações do servidor, mas o plugin de Banco de Dados não pode acessar o objeto do plugin para Calcular a Cor da interface.
+
+	Esta restrição foi criada para impedir a Forte Dependência entre Plugins.
+	Neste caso, o Plugin de Logs não sabe qual implementação de Interface gráfica será utilizada, e nada garante que o plugin CalculaCor será realmente carregado.
+	Assim, para utilizar o plugin CalculaCor em PLog deve ser carregado outra instancia do Plugin com a chamada LoadPlugin<CalculaCor>("Caminho") ou LoadPlugin(new ImpCalculaCor()), e a chamada GetPlugin<CalculaCor>() retornará o objeto carregado localmente.
+
+
+	Para acesso direto ao plugin Pai, todo Plugin tem disponível a propriedade Parent, que é preenchida durante a chamada LoadPlugin.

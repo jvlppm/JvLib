@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B9A2AF2B-30A5-446A-AE4E-6E02292878A0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Jv.DynamicApplication</RootNamespace>
+    <AssemblyName>Jv.DynamicApplication</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\bin\Release\Jv.DynamicApplication.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Application.cs" />
+    <Compile Include="CallBack.cs" />
+    <Compile Include="Plugins\Definitions\Business\BusinessException.cs" />
+    <Compile Include="Plugins\Definitions\Business\PBusiness.cs" />
+    <Compile Include="Plugins\Definitions\Gui\Messages.cs" />
+    <Compile Include="Plugins\Definitions\PFlux.cs" />
+    <Compile Include="Plugins\Definitions\Gui\PGui.cs" />
+    <Compile Include="Plugins\Implementation\GuiChangeThread.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextFormat\AbstractNumber.cs" />
+    <Compile Include="TextFormat\Decimal.cs" />
+    <Compile Include="TextFormat\Double.cs" />
+    <Compile Include="TextFormat\Events\Input.cs" />
+    <Compile Include="TextFormat\Events\InputAdd.cs" />
+    <Compile Include="TextFormat\Events\InputClear.cs" />
+    <Compile Include="TextFormat\Events\PreviewInputAdd.cs" />
+    <Compile Include="TextFormat\Float.cs" />
+    <Compile Include="TextFormat\Int.cs" />
+    <Compile Include="TextFormat\Long.cs" />
+    <Compile Include="TextFormat\Short.cs" />
+    <Compile Include="TextFormat\String.cs" />
+    <Compile Include="TextFormat\AbstractInput.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Jv.Plugins\Jv.Plugins.csproj">
+      <Project>{894D3892-0E4E-4B73-B3AC-6DA8D9375D14}</Project>
+      <Name>Jv.Plugins</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Jv.Threading\Jv.Threading.csproj">
+      <Project>{97B35196-5035-4812-826F-2DD359F3A6A5}</Project>
+      <Name>Jv.Threading</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

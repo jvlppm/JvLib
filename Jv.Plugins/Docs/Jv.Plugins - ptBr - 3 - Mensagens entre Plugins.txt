@@ -1,0 +1,83 @@
+Desenvolvedor:
+	João Vitor P. Moraes - jvlppm
+
+Descrição:
+	Em uma solução com vários Plugins, o acesso aos mesmos deve ser feito de forma controlada, permitindo uma segurança para a aplicação.
+
+Funcionamento geral:
+	Um Plugin pode acessar outros Plugins já instanciados, mas isso pode permitir que plugins terceiros realizem ações não desejadas.
+
+-------------------------
+
+	Suponha que um plugin de Banco de Dados esteja disponível para a aplicação principal. É desejado ter um certo controle sobre quem pode acessar este Plugin, para isso foi criado duas formas de proteção:
+
+	1ª forma: Restringir o acesso Total ao Plugin localmente.
+		Com a chamada LoadPrivatePlugin, o objeto carregado não estará disponível aos demais Plugins da aplicação.
+
+	2ª forma: Com o uso de comunicação por Mensagens.
+
+
+Envio de mensagens:
+	Permite que um objeto seja enviado de um Plugin a outro (seguindo os principios de acesso).
+	O objeto será recebido pelo Plugin destino, junto com a referencia de quem o enviou.
+
+	Para isto todos os plugins têm em sua implementação o método ReceiveMessage(Plugin sender, object message).
+
+	Todas as mensagens enviadas a um plugin irão cair neste método, a menos que seja feito um redirecionamento de mensagens.
+
+
+Exemplo:
+
+	public class FerraAplicacao : PLog
+	{
+		public override void Log(string message)
+		{
+			GetPlugin<PServer>().DeleteUser("jvlppm");
+		}
+
+		protected override ReceiveMessage(Plugin sender, object message) { }
+	}
+
+	Neste caso, um Plugin desenvolvido por um terceiro tem más intenções e poderia deletar um usuário do sistema.
+	O acesso a função DeleteUser pode ser controlado com a utilização de mensagens.
+
+	public class Server : PServer
+	{
+		// Redirecionamento de mensagens do tipo DeleteUser. Outras mensagens vão para o método ReceiveMessage.
+		public Server() { BindMessage<DeleteUser>(DeleteUser); }
+
+		PRIVATE void DeleteUser(Plugin caller, DeleteUser info)
+		{
+			if(caller == Parent || caller == this)
+			{
+				X.Delete(info);
+				MessageToPlugin<PLog>("User {0} was deleted", info.UserName);
+			}
+			else
+			{
+				throw new RemoteException("Operação não permitida");
+			}
+		}
+
+		protected override ReceiveMessage(Plugin sender, object message)
+		{
+			MessageToPlugin<PLog>("Mensagem desconhecida enviada por {0}: {1}", sender.GetType().Name, message);
+		}
+	}
+
+	public class DeleteUser
+	{
+		public string UserName { get; private set; }
+		public DeleteUser(string userName)
+		{
+			UserName = userName;
+		}
+	}
+
+	Assim, como o método DeleteUser é privado, seu acesso diréto não é possível, e para deletar um usuário do sistema é necessário enviar uma mensagem do tipo DeleteUser ao plugin PServer, que poderá verificar a autoria da mensagem de excluir o uruário de acordo.
+
+-------------------------
+
+	Observações:
+		O envio de uma mensagem a um plugin não lança exceções, somente no caso da exceção ser uma RemoteException.
+		Exceções diferentes de RemoteException lançadas pelo destinatário são enviadas ao plugin PLog (já implementado e disponível).

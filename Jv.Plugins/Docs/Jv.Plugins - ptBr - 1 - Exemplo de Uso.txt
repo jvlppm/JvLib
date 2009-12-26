@@ -1,0 +1,99 @@
+Desenvolvedor:
+	João Vitor P. Moraes - jvlppm
+
+Descrição:
+	Projeto com classes para facilitar o desenvolvimento e utilização de Plugins por um programa .Net
+
+Funcionamento geral:
+	Uma classe abstrata é definida para representar todos os Plugins de determinado tipo, esta classe é definida no programa principal, e com ela é possivel carregar implementações da mesma em uma Dll externa conhecendo seu Path.
+
+-------------------------
+
+Exemplo de uso:
+	Neste exemplo irei criar um tipo de Plugin para manipular mensagens de Log.
+
+1º passo: Definir a base de um tipo de Plugin, com os métodos necessários para sua utilizaçao de forma abstrata.
+
+
+	public abstract class PLog : Jv.Plugin
+	{
+		public abstract void Clear();
+		public abstract void Log(string message);
+
+		// Função será explicada mais adiante.
+		protected internal override void ReceiveMessage(Plugin sender, object message) { }
+	}
+
+	Assim representamos um plugin de Log, que terá os métodos Clear e Log(message).
+
+
+2º passo: Na aplicação principal carregar o plugin para sua utilização.
+
+	Para isso temos o PluginManager, que disponibiliza os métodos LoadPlugin<PluginType>(string path), e LoadPlugin(Plugin obj).
+
+	Onde PluginType é a classe abstrata criada.
+
+	static void Main()
+	{
+		var PluginManager = new Jv.Plugins.Manager();
+		PluginManager.LoadPlugin<PLog>("PluginLog.dll");
+		...
+	}
+
+	O que ocorre é que a Dll indicada será lida e um objeto instanciado do tipo PLog será guardado.
+
+
+3º passo: Acesso ao plugin carregado (objeto instanciado)
+
+	Para acessar o Plugin carregado também utilizamos o PluginManager.
+
+	static void Main()
+	{
+		...
+		PluginManager.GetPlugin<PLog>().Log("Plugin carregado e funcionando");
+	}
+
+
+4º passo: O desenvolvimento do plugin.
+	Deve ser criada uma classe não abstrata, que tem herança direta / indireta com PLog. Esta classe deve ser gerada em uma Dll cujo programa irá acessa-la.
+
+	public class TxtLogger : PLog
+	{
+		public override void Clear()
+		{
+			try
+			{
+				StreamWriter arquivo = File.CreateText("Log.txt");
+				arquivo.Close();
+			}
+			catch { }
+		}
+
+		public override void Log(string message)
+		{
+			try
+			{
+				StreamWriter arquivo = File.Exists("Log.txt") ?
+									  File.AppendText("Log.txt")
+									: File.CreateText("Log.txt");
+
+				arquivo.WriteLine(text);
+			}
+			finally
+			{
+				arquivo.Close();
+			}
+		}
+	}
+
+	Exportar esta classe para uma dll e deixá-la no mesmo diretório do programa, assim tudo irá funcionar.
+
+5º passo: Teste.
+	Após a classe TxtLogger estar implementada em "PluginLog.dll" (que se encontra na pasta do aplicativo principal), o programa de testes deve funcionar
+	
+	static void Main()
+	{
+		var PluginManager = new Jv.Plugins.Manager();
+		PluginManager.LoadPlugin<PLog>("PluginLog.dll");
+		PluginManager.GetPlugin<PLog>().Log("Plugin carregado e funcionando");
+	}
