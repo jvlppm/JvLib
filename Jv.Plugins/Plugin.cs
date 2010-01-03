@@ -255,6 +255,16 @@ namespace Jv.Plugins
 		/// Envia mensagem para os plugins de tipo PluginType.
 		/// </summary>
 		/// <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
+		/// <param name="message">Mensagem a ser recebida pelos plugins.</param>
+		protected internal void MessageToPlugin<PluginType>(string message) where PluginType : Plugin
+		{
+			MessageToPlugin<PluginType>(this, message);
+		}
+
+		/// <summary>
+		/// Envia mensagem para os plugins de tipo PluginType.
+		/// </summary>
+		/// <typeparam name="PluginType">Tipo da Base do plugin carregado.</typeparam>
 		/// <param name="format">Formato da mensagem (string.Format).</param>
 		/// <param name="args">argumentos da mensagem.</param>
 		protected internal void MessageToPlugin<PluginType>(string format, params object[] args) where PluginType : Plugin
