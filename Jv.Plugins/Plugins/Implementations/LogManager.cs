@@ -11,30 +11,15 @@ namespace Jv.Plugins
 	class LogManager : PLog
 	{
 		#region Attributes
-		readonly Dictionary<Plugin, StreamWriter> _files;
+		StreamWriter _log;
 		readonly Dictionary<Plugin, Stack<StartGroup>> _structure;
 		#endregion
 
 		#region Constructors
 		public LogManager()
 		{
-			_files = new Dictionary<Plugin, StreamWriter>();
 			_structure = new Dictionary<Plugin, Stack<StartGroup>>();
-			Path = "Logs";
-
-			DirectoryInfo directoryInfo = new DirectoryInfo(Path);
-
-			if (directoryInfo.Exists)
-			{
-				foreach (var file in directoryInfo.GetFiles())
-				{
-					try { File.Delete(file.FullName); }
-					catch { }
-				}
-			}
-			else directoryInfo.Create();
-
-			_files.Add(this, File.CreateText(string.Format("{0}/Global.txt", Path)));
+			Path = "Log.txt";
 		}
 		#endregion
 
@@ -54,7 +39,7 @@ namespace Jv.Plugins
 			string dados = string.Format("{0} {1,-10}: {2}{3}", DateTime.Now.ToString("HH:mm:ss.fff"), sender.GetType().Name,
 											 CalculateTabs(sender), message);
 
-			WriteLog(sender, dados);
+			WriteLog(dados);
 		}
 
 		protected override void LogException(Plugin sender, Exception ex)
@@ -194,27 +179,15 @@ namespace Jv.Plugins
 			return _structure.ContainsKey(sender) ? new string('\t', _structure[sender].Count) : string.Empty;
 		}
 
-		void WriteLog(Plugin sender, string text)
+		void WriteLog(string text)
 		{
-			try
+			lock (this)
 			{
-				lock (sender)
-				{
-					if (!_files.ContainsKey(sender))
-						_files.Add(sender, File.CreateText(string.Format("{0}/{1}.txt", Path, sender)));
-
-				
-					_files[sender].WriteLine(text);
-					_files[sender].Flush();
-				}
-			}
-			finally
-			{
-				lock (this)
-				{
-					_files[this].WriteLine(text);
-					_files[this].Flush();
-				}
+				if (_log == null)
+					_log = new StreamWriter(Path);
+			
+				_log.WriteLine(text);
+				_log.Flush();
 			}
 		}
 		#endregion

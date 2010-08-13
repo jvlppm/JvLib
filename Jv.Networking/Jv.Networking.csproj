@@ -42,6 +42,7 @@
     <Compile Include="Proxy\Exception\ProxyException.cs" />
     <Compile Include="Proxy\IProxy.cs" />
     <Compile Include="Proxy\UdpProxy.cs" />
+    <Compile Include="RawPackage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Jv.Threading\Jv.Threading.csproj">
