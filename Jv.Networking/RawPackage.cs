@@ -65,6 +65,15 @@
 
 			return text;
 		}
+
+		public byte[] ReadBytes(int count)
+		{
+			byte[] data = new byte[count];
+			for(int i = 0; i < count; i++)
+				data[i] = ReadByte();
+
+			return data;
+		}
 		#endregion
 
 		#region WriteData
