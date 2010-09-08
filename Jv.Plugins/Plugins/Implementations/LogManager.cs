@@ -8,24 +8,29 @@ using Messages.Log;
 
 namespace Jv.Plugins
 {
-	class LogManager : PLog
+	public interface IFileManager
+	{
+		string FilePath { get; set; }
+	}
+
+	class LogManager : PLog, IFileManager
 	{
 		#region Attributes
 		StreamWriter _log;
 		readonly Dictionary<Plugin, Stack<StartGroup>> _structure;
+
+		public string FilePath { get; set; }
 		#endregion
 
 		#region Constructors
 		public LogManager()
 		{
 			_structure = new Dictionary<Plugin, Stack<StartGroup>>();
-			Path = "Log.txt";
+			FilePath = "Log.txt";
 		}
 		#endregion
 
 		#region PLog Implementation
-
-		public string Path { get; set; }
 
 		protected override void LogString(Plugin sender, string message)
 		{
@@ -184,7 +189,11 @@ namespace Jv.Plugins
 			lock (this)
 			{
 				if (_log == null)
-					_log = new StreamWriter(Path);
+				{
+					var logFileInfo = new FileInfo(FilePath);
+					logFileInfo.Directory.Create();
+					_log = new StreamWriter(FilePath);
+				}
 			
 				_log.WriteLine(text);
 				_log.Flush();
