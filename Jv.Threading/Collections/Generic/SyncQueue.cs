@@ -8,7 +8,7 @@ namespace Jv.Threading.Collections.Generic
 	{
 		#region Fields
 		readonly Queue<Type> _items;
-		readonly Semaphore _counter;
+		readonly Semaphore _counter, _waitingFlush;
 		#endregion
 
 		#region Constructors
@@ -16,6 +16,7 @@ namespace Jv.Threading.Collections.Generic
 		{
 			_items = new Queue<Type>();
 			_counter = new Semaphore(0, int.MaxValue);
+			_waitingFlush = new Semaphore(0, int.MaxValue);
 		}
 		#endregion
 
@@ -41,10 +42,16 @@ namespace Jv.Threading.Collections.Generic
 
 		public Type Dequeue()
 		{
-			_counter.WaitOne();
-
-			lock (_items)
-				return _items.Dequeue();
+			do
+			{
+				_counter.WaitOne();
+				lock (_items)
+				{
+					if (_items.Count != 0)
+						return _items.Dequeue();
+					else _waitingFlush.Release();
+				}
+			} while (true);
 		}
 		#endregion
 
@@ -58,6 +65,12 @@ namespace Jv.Threading.Collections.Generic
 		public Type RemoveNext()
 		{
 			return Dequeue();
+		}
+
+		public void Flush()
+		{
+			_counter.Release();
+			_waitingFlush.WaitOne();
 		}
 
 		#endregion

@@ -4,5 +4,6 @@
 	{
 		void Add(Type obj);
 		Type RemoveNext();
+		void Flush();
 	}
 }

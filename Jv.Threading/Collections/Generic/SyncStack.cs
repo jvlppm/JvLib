@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Jv.Threading.Collections.Generic
 {
-	public class SyncStack<Type> : IEnumerable<Type>, ISyncCollection<Type>
+	/*public class SyncStack<Type> : IEnumerable<Type>, ISyncCollection<Type>
 	{
 		#region Fields
 		readonly Stack<Type> _items;
@@ -61,5 +61,5 @@ namespace Jv.Threading.Collections.Generic
 		}
 
 		#endregion
-	}
+	}*/
 }
