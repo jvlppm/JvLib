@@ -1,4 +1,6 @@
-﻿namespace Jv.Networking
+﻿using System.Linq;
+
+namespace Jv.Networking
 {
 	public class RawPackage
 	{
@@ -44,24 +46,15 @@
 		public string ReadString(params char[] endChars)
 		{
 			string text = string.Empty;
-			char ch;
-			bool finished;
-			do
-			{
-				finished = false;
-				ch = (char)ReadByte();
-				foreach (var end in endChars)
-				{
-					if (ch == end)
-					{
-						finished = true;
-						break;
-					}
-				}
 
-				if (!finished)
-					text += ch;
-			} while (!finished && CurrentPosition < Data.Length);
+			while (CurrentPosition < Data.Length)
+			{
+				char ch = (char)ReadByte();
+				if (endChars.Contains(ch))
+					break;
+
+				text += ch;
+			}
 
 			return text;
 		}
