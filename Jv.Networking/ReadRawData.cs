@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
+using System;
 
 namespace Jv.Networking
 {
@@ -25,12 +26,23 @@ namespace Jv.Networking
 
 		public short ReadShort()
 		{
-			return (short)((ReadByte()) + (((uint)ReadByte()) << 8));
+			var value = BitConverter.ToInt16(Data, CurrentPosition);
+			CurrentPosition += 2;
+			return value;
 		}
 
 		public int ReadInt()
 		{
-			return (int)((ReadByte()) + (((uint)ReadByte()) << 8) + (((uint)ReadByte()) << 16) + (((uint)ReadByte()) << 24));
+			var value = BitConverter.ToInt32(Data, CurrentPosition);
+			CurrentPosition += 4;
+			return value;
+		}
+
+		public float ReadFloat()
+		{
+			var value = BitConverter.ToSingle(Data, CurrentPosition);
+			CurrentPosition += 4;
+			return value;
 		}
 
 		public string ReadString()
@@ -72,9 +84,8 @@ namespace Jv.Networking
 		public byte[] ReadBytes(int count)
 		{
 			byte[] data = new byte[count];
-			for(int i = 0; i < count; i++)
-				data[i] = ReadByte();
-
+			Array.Copy(Data, CurrentPosition, data, 0, count);
+			CurrentPosition += count;
 			return data;
 		}
 		#endregion
